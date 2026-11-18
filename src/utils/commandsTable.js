@@ -1,33 +1,31 @@
 module.exports = {
   mkdir: {
     name: "mkdir",
-    description: "mkdir: create directories using `mkdir <folder name>`"
+    description: "mkdir: create a directory  —  `mkdir <name>` or `mkdir {a,b}`"
   },
   touch: {
     name: "touch",
-    description:
-      "touch: create files using `touch fileName, or touch {file1.ext,file2.ext}` for multiple"
+    description: "touch: create a file  —  `touch <name>` or `touch {a.ext,b.ext}`"
   },
   ls: {
     name: "ls",
-    description: "ls: list items within the target folder"
+    description: "ls: list contents of current directory"
   },
   cd: {
     name: "cd",
-    description: "cd: navigate directories using `cd <folder>` or `cd ..` to go up"
+    description: "cd: change directory  —  `cd <name>` or `cd ..` to go up"
   },
   pwd: {
     name: "pwd",
-    description: "pwd: print current working directory"
+    description: "pwd: print current directory path"
   },
   clear: {
     name: "clear",
-    description: "clear: clear and reset prompt to get rid of old messages"
+    description: "clear: clear terminal output"
   },
   rm: {
     name: "rm",
-    description:
-      "rm: delete files `rm <file name>`, or `rm <fileOne,fileTwo,fileTree>`",
+    description: "rm: delete a file  —  `rm <name>` or `rm {a,b,c}`",
     disabled: true
   }
 };
