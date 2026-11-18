@@ -1,0 +1,85 @@
+.container {
+  width: 100%;
+  min-height: 450px;
+  height: 70vh;
+  overflow-y: auto;
+  border-radius: 6px;
+  background-color: #000;
+}
+
+.menuBar {
+  width: 100%;
+  border-radius: 5px 5px 0 0;
+  height: 25px;
+  background-color: #f9f9f9;
+  text-align: left;
+  padding: 2px 0 0 10px;
+  box-sizing: border-box;
+  position: sticky;
+  top: 0;
+}
+
+.barOption {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 10px;
+  display: inline-block;
+  vertical-align: middle;
+}
+
+.red   { background-color: #ff5f56; }
+.blue  { background-color: #57b0f4; }
+.green { background-color: #27c93f; }
+
+.content {
+  color: white;
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 14px;
+  text-align: left;
+  padding: 8px 10px;
+}
+
+.line {
+  width: 100%;
+  margin-bottom: 2px;
+}
+
+.logLine {
+  width: 100%;
+  color: #a9a9a9;
+  margin-bottom: 8px;
+}
+
+.inputLine {
+  width: 100%;
+  display: flex;
+  margin-top: 2px;
+}
+
+.outputLine {
+  width: 100%;
+  color: #d4d4d4;
+}
+
+.errorLine {
+  width: 100%;
+  color: #f47067;
+}
+
+.prompt {
+  white-space: nowrap;
+  user-select: none;
+  color: #57b0f4;
+}
+
+.input {
+  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
+  font-size: 14px;
+  flex-grow: 1;
+  padding-left: 6px;
+  color: white;
+  white-space: nowrap;
+  cursor: text;
+  outline: none;
+}
