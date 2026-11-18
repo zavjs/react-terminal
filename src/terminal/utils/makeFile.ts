@@ -1,7 +1,7 @@
 import { Tree, DirNode, isDir } from '../types';
 
 const createFiles = (tree: Tree, files: string[]): Tree =>
-  files.reduce((acc, name) => ({ ...acc, [name]: { name } }), { ...tree });
+  files.reduce((acc, name) => ({ ...acc, [name]: { type: 'file' as const, content: '' } }), { ...tree });
 
 export const makeFile = (
   tree: Tree,

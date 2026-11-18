@@ -11,13 +11,13 @@ const ctx = (tree: Tree = {}, cwd: string[] = []) => ({
 
 describe('cd', () => {
   it('navigates into an existing directory', () => {
-    const tree: Tree = { src: { name: 'src', contents: {} } };
+    const tree: Tree = { src: { type: 'dir', contents: {} } };
     const result = cd.execute('src', ctx(tree));
     expect(result.cwd).toEqual(['src']);
   });
 
   it('goes up one level with ..', () => {
-    const tree: Tree = { src: { name: 'src', contents: {} } };
+    const tree: Tree = { src: { type: 'dir', contents: {} } };
     const result = cd.execute('..', ctx(tree, ['src']));
     expect(result.cwd).toEqual([]);
   });
@@ -38,7 +38,7 @@ describe('cd', () => {
   });
 
   it('returns error when target is a file not a dir', () => {
-    const tree: Tree = { 'index.ts': { name: 'index.ts' } };
+    const tree: Tree = { 'index.ts': { type: 'file', content: '' } };
     const result = cd.execute('index.ts', ctx(tree));
     expect(result.error).toMatch(/No such file or directory/);
   });

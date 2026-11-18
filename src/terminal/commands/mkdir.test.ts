@@ -12,13 +12,13 @@ const ctx = (tree: Tree = {}, cwd: string[] = []) => ({
 describe('mkdir', () => {
   it('creates a directory at root', () => {
     const result = mkdir.execute('src', ctx());
-    expect(result.tree).toMatchObject({ src: { name: 'src', contents: {} } });
+    expect(result.tree).toMatchObject({ src: { type: 'dir', contents: {} } });
   });
 
   it('creates a directory relative to cwd', () => {
-    const tree: Tree = { src: { name: 'src', contents: {} } };
+    const tree: Tree = { src: { type: 'dir', contents: {} } };
     const result = mkdir.execute('utils', ctx(tree, ['src']));
-    expect((result.tree?.src as any).contents.utils).toMatchObject({ name: 'utils' });
+    expect((result.tree?.src as any).contents.utils).toMatchObject({ type: 'dir' });
   });
 
   it('returns error when no argument given', () => {

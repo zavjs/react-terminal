@@ -11,14 +11,14 @@ const ctx = (tree: Tree = {}, cwd: string[] = []) => ({
 
 describe('ls', () => {
   it('lists root contents', () => {
-    const tree: Tree = { src: { name: 'src', contents: {} } };
+    const tree: Tree = { src: { type: 'dir', contents: {} } };
     const result = ls.execute(undefined, ctx(tree));
     expect(result.output).toBe('src');
   });
 
   it('lists contents of cwd', () => {
     const tree: Tree = {
-      src: { name: 'src', contents: { 'index.ts': { name: 'index.ts' } } },
+      src: { type: 'dir', contents: { 'index.ts': { type: 'file', content: '' } } },
     };
     const result = ls.execute(undefined, ctx(tree, ['src']));
     expect(result.output).toBe('index.ts');

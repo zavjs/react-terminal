@@ -7,7 +7,7 @@ export const makeTree = (tree: Tree, parts: string[]): Tree | string => {
 
   if (rest.length === 0) {
     if (tree[head] && isDir(tree[head])) return tree;
-    return { ...tree, [head]: { name: head, contents: {} } };
+    return { ...tree, [head]: { type: 'dir' as const, contents: {} } };
   }
 
   const node = tree[head];

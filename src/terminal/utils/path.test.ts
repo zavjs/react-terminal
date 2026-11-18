@@ -2,10 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { getContentsList, getFilePath, getFileName, getNodeAtPath } from './path';
 import { Tree } from '../types';
 
-const dir = (name: string, contents: Tree = {}): Tree[string] => ({
-  name,
-  contents,
-});
+const dir = (contents: Tree = {}): Tree[string] => ({ type: 'dir', contents });
+const file = (): Tree[string] => ({ type: 'file', content: '' });
 
 describe('getContentsList', () => {
   it('splits a plain path', () => {
@@ -50,14 +48,14 @@ describe('getFileName', () => {
 });
 
 describe('getNodeAtPath', () => {
-  const tree: Tree = { src: dir('src', { utils: dir('utils') }) };
+  const tree: Tree = { src: dir({ utils: dir() }) };
 
   it('returns root tree for empty path', () => {
     expect(getNodeAtPath(tree, [])).toEqual(tree);
   });
 
   it('returns contents of existing directory', () => {
-    expect(getNodeAtPath(tree, ['src'])).toEqual({ utils: dir('utils') });
+    expect(getNodeAtPath(tree, ['src'])).toEqual({ utils: dir() });
   });
 
   it('returns null for nonexistent path', () => {
@@ -65,7 +63,7 @@ describe('getNodeAtPath', () => {
   });
 
   it('returns null when segment is a file not a dir', () => {
-    const t: Tree = { 'index.ts': { name: 'index.ts' } };
+    const t: Tree = { 'index.ts': file() };
     expect(getNodeAtPath(t, ['index.ts'])).toBeNull();
   });
 });

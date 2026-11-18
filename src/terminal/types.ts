@@ -1,10 +1,10 @@
-export type FileNode = { name: string };
-export type DirNode = { name: string; contents: Tree };
+export type FileNode = { type: 'file'; content: string };
+export type DirNode = { type: 'dir'; contents: Tree };
 export type TreeNode = FileNode | DirNode;
 export type Tree = Record<string, TreeNode>;
 
 export function isDir(node: TreeNode): node is DirNode {
-  return 'contents' in node;
+  return node.type === 'dir';
 }
 
 export type CommandResult = {
