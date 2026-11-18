@@ -48,11 +48,11 @@ const Terminal = ({
     sel?.addRange(range);
   }, []);
 
-  const appendLog = useCallback((text: string | string[], isError = false) => {
+  const appendLog = useCallback((text: string | string[], type: 'output' | 'error' = 'output') => {
     const entries = (Array.isArray(text) ? text : [text]).map(t => ({
       id: nanoid(),
+      type,
       text: t,
-      isError,
     }));
     setLog(prev => [...prev, ...entries]);
   }, []);
@@ -75,12 +75,14 @@ const Terminal = ({
       if (result.cwd !== undefined) setCwd(result.cwd);
       if (result.clear) setLog([]);
       if (result.output) appendLog(result.output);
-      if (result.error) appendLog(result.error, true);
+      if (result.error) appendLog(result.error, 'error');
 
       onCommand?.(command, result);
     },
     [tree, cwd, allCommands, appendLog, onCommand]
   );
+
+  const prompt = `${machineName}:~${cwd.length ? '/' + cwd.join('/') : ''} ${username}$`;
 
   const handleKeyDown = useCallback(
     (event: React.KeyboardEvent) => {
@@ -114,20 +116,16 @@ const Terminal = ({
       if (event.key === 'Enter') {
         event.preventDefault();
         const value = inputRef.current?.textContent?.trim() ?? '';
-        if (!value) {
-          setInputValue('');
-          return;
-        }
+        setInputValue('');
+        if (!value) return;
+        setLog(prev => [...prev, { id: nanoid(), type: 'echo', prompt, command: value }]);
         setHistory(prev => [...prev, value]);
         setHistoryIndex(-1);
         executeCommand(value);
-        setInputValue('');
       }
     },
-    [history, historyIndex, executeCommand, setInputValue]
+    [history, historyIndex, prompt, executeCommand, setInputValue]
   );
-
-  const prompt = `${machineName}:~${cwd.length ? '/' + cwd.join('/') : ''} ${username}$`;
 
   return (
     <div
@@ -145,14 +143,24 @@ const Terminal = ({
         <div className={styles.logLine}>
           Press `help` to see available commands
         </div>
-        {log.map(entry => (
-          <div
-            key={entry.id}
-            className={entry.isError ? styles.errorLine : styles.outputLine}
-          >
-            {entry.text}
-          </div>
-        ))}
+        {log.map(entry => {
+          if (entry.type === 'echo') {
+            return (
+              <div key={entry.id} className={styles.inputLine}>
+                <span className={styles.prompt}>{entry.prompt}</span>
+                <span className={styles.echoCommand}>{entry.command}</span>
+              </div>
+            );
+          }
+          return (
+            <div
+              key={entry.id}
+              className={entry.type === 'error' ? styles.errorLine : styles.outputLine}
+            >
+              {entry.text}
+            </div>
+          );
+        })}
         <div className={styles.inputLine}>
           <span className={styles.prompt}>{prompt}</span>
           <div

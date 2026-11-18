@@ -28,11 +28,10 @@ export type Command = {
   execute: (arg: string | undefined, ctx: CommandContext) => CommandResult;
 };
 
-export type LogEntry = {
-  id: string;
-  text: string;
-  isError: boolean;
-};
+export type LogEntry =
+  | { id: string; type: 'output'; text: string }
+  | { id: string; type: 'error'; text: string }
+  | { id: string; type: 'echo'; prompt: string; command: string };
 
 export type TerminalProps = {
   commands?: Command[];

@@ -83,3 +83,8 @@
   cursor: text;
   outline: none;
 }
+
+.echoCommand {
+  padding-left: 6px;
+  color: white;
+}
