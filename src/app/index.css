@@ -34,9 +34,12 @@
 .App {
   font-family: sans-serif;
   text-align: center;
-  height: 1000px;
+  min-height: 100vh;
   padding: 20px;
-  background-color: blanchedalmond;
+  background-color: #f0f0f2;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
 }
 
 body {

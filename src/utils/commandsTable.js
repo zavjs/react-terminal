@@ -12,6 +12,14 @@ module.exports = {
     name: "ls",
     description: "ls: list items within the target folder"
   },
+  cd: {
+    name: "cd",
+    description: "cd: navigate directories using `cd <folder>` or `cd ..` to go up"
+  },
+  pwd: {
+    name: "pwd",
+    description: "pwd: print current working directory"
+  },
   clear: {
     name: "clear",
     description: "clear: clear and reset prompt to get rid of old messages"

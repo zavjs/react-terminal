@@ -67,6 +67,13 @@ const resolve_file_name = fileName => {
   return fileName;
 };
 
+const get_node_at_path = (tree, path) => {
+  return path.reduce((node, segment) => {
+    if (!node || !node[segment] || node[segment].contents === undefined) return null;
+    return node[segment].contents;
+  }, tree);
+};
+
 const create_files = (source, filesList) => {
   return filesList.reduce((acc, curr) => {
     return Object.assign({}, acc, {
@@ -100,6 +107,7 @@ module.exports = {
   get_file_path,
   get_file_name,
   get_contents_list,
+  get_node_at_path,
   makeFile,
   makeTree
 };

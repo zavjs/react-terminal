@@ -3,20 +3,13 @@ import styled from "styled-components";
 import shortid from "shortid";
 
 const Container = styled.div`
-  max-width: 100%;
-  width: 600px;
-  height: 200px;
-  max-width: 768px;
-  max-height: 340px;
-  overflow: scroll;
+  width: 100%;
+  min-height: 450px;
+  height: 70vh;
+  overflow-y: auto;
   border-radius: 6px;
   background-color: #000;
-  background-color: rgb(0, 0, 0, 0.75);
   margin-top: 50px;
-
-  @media only screen and (max-width: 640px) {
-    width: 100%;
-  }
 `;
 
 const MenuBar = styled.div`
@@ -61,17 +54,15 @@ const LogLine = styled.div`
   color: #a9a9a9;
 `;
 
-const Input = styled.input`
-  border: 0;
-  background-color: transparent;
+const Input = styled.div`
   font-family: "Monaco", monospace;
   flex-grow: 1;
   padding-left: 5px;
   color: white;
   font-size: 15px;
-  padding-top: 0;
+  white-space: nowrap;
+  cursor: text;
 
-  &:active,
   &:focus {
     outline: 0;
   }
@@ -83,13 +74,16 @@ const Terminal = ({
   lastLogin,
   machineName,
   username,
-  type,
   log,
-  typeCommand,
-  commandValue,
-  onEnter
+  onEnter,
+  cwd,
+  containerRef,
+  inputRef
 }) => (
-  <Container>
+  <Container
+    innerRef={containerRef}
+    onClick={() => inputRef && inputRef.current && inputRef.current.focus()}
+  >
     <MenuBar>
       <BarOption />
       <BarOption color="blue" />
@@ -103,9 +97,14 @@ const Terminal = ({
       ))}
       <InputLine>
         <InputLog>
-          {machineName}: ~ {username}$
+          {machineName}:~{cwd && cwd.length ? "/" + cwd.join("/") : ""} {username}$
         </InputLog>
-        <Input onKeyUp={onEnter} onChange={typeCommand} value={commandValue} />
+        <Input
+          innerRef={inputRef}
+          contentEditable="true"
+          suppressContentEditableWarning
+          onKeyDown={onEnter}
+        />
       </InputLine>
     </Content>
   </Container>
@@ -114,7 +113,8 @@ const Terminal = ({
 Terminal.defaultProps = {
   machineName: "computer",
   lastLogin: "Sun Sep 2 22:0043",
-  username: "User"
+  username: "User",
+  cwd: []
 };
 
 export default Terminal;

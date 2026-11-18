@@ -27,11 +27,11 @@ const makeTree = function(tree, parts) {
   }
 
   if (parts[2]) {
-    if (!tree[parts[0]] && !tree[parts[0]].contents[parts[1]]) {
+    if (!tree[parts[0]] || !tree[parts[0]].contents[parts[1]]) {
       return parts.join("/") + ": no such file or directory";
     } else {
       obj[parts[0]].contents[parts[1]].contents = Object.assign(
-        obj.parts[0].contents[parts[1]].contents,
+        obj[parts[0]].contents[parts[1]].contents,
         {
           [parts[2]]: {
             name: parts[2],

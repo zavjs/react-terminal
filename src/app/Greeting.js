@@ -2,12 +2,9 @@ import React from "react";
 import styled from "styled-components";
 
 const Container = styled.div`
-  position: absolute;
-  top: 15px;
-  left: 0;
-  right: 0;
-  margin: auto;
-  opacity: 0.25;
+  margin-top: auto;
+  padding-top: 20px;
+  opacity: 0.4;
 `;
 const Greeting = () => (
   <Container>
