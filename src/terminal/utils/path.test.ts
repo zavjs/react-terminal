@@ -34,16 +34,12 @@ describe('getFilePath', () => {
 });
 
 describe('getFileName', () => {
-  it('returns single filename', () => {
+  it('returns filename from path', () => {
     expect(getFileName('src/index.ts')).toBe('index.ts');
   });
 
-  it('returns array for brace syntax', () => {
-    expect(getFileName('{a.ts,b.ts}')).toEqual(['a.ts', 'b.ts']);
-  });
-
-  it('trims spaces in brace syntax', () => {
-    expect(getFileName('{a.ts, b.ts}')).toEqual(['a.ts', 'b.ts']);
+  it('returns root-level filename', () => {
+    expect(getFileName('index.ts')).toBe('index.ts');
   });
 });
 

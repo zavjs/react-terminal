@@ -4,13 +4,17 @@ import { makeTree } from '../utils/makeTree';
 
 const mkdir: Command = {
   name: 'mkdir',
-  description: "mkdir: create a directory  —  `mkdir <name>` or `mkdir {a,b}`",
-  execute(arg, { tree, cwd }) {
-    if (!arg) return { error: 'mkdir: missing operand' };
-    const parts = getContentsList(arg);
-    const result = makeTree(tree, [...cwd, ...parts]);
-    if (typeof result === 'string') return { error: result };
-    return { tree: result };
+  description: "mkdir: create a directory  —  `mkdir <name>` or `mkdir a b`",
+  execute({ args }, { tree, cwd }) {
+    if (!args.length) return { error: 'mkdir: missing operand' };
+    let current = tree;
+    for (const arg of args) {
+      const parts = getContentsList(arg);
+      const result = makeTree(current, [...cwd, ...parts]);
+      if (typeof result === 'string') return { error: result };
+      current = result;
+    }
+    return { tree: current };
   },
 };
 

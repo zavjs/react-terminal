@@ -1,3 +1,6 @@
+import type { ParsedArgs } from './utils/parseArgs';
+export type { ParsedArgs };
+
 export type FileNode = { type: 'file'; content: string };
 export type DirNode = { type: 'dir'; contents: Tree };
 export type TreeNode = FileNode | DirNode;
@@ -25,7 +28,7 @@ export type Command = {
   name: string;
   description: string;
   disabled?: boolean;
-  execute: (arg: string | undefined, ctx: CommandContext) => CommandResult;
+  execute: (parsed: ParsedArgs, ctx: CommandContext) => CommandResult;
 };
 
 export type LogEntry =

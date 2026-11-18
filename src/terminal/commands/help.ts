@@ -3,7 +3,8 @@ import { Command } from '../types';
 const help: Command = {
   name: 'help',
   description: 'help: list available commands',
-  execute(arg, { allCommands }) {
+  execute({ args }, { allCommands }) {
+    const arg = args[0];
     if (arg && allCommands[arg]) {
       return { output: allCommands[arg].description };
     }

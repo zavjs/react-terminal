@@ -16,13 +16,8 @@ export const getFilePath = (pathToFile: string): string[] => {
   return parts.slice(0, -1);
 };
 
-export const getFileName = (pathToFile: string): string | string[] => {
-  const fileName = pathToFile.split('/').slice(-1)[0].trim();
-  if (fileName.startsWith('{') && fileName.endsWith('}')) {
-    return fileName.slice(1, -1).split(',').map(f => f.trim());
-  }
-  return fileName;
-};
+export const getFileName = (pathToFile: string): string =>
+  pathToFile.split('/').slice(-1)[0].trim();
 
 export const getNodeAtPath = (tree: Tree, path: string[]): Tree | null =>
   path.reduce<Tree | null>((node, segment) => {

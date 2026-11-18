@@ -4,7 +4,8 @@ import { getNodeAtPath } from '../utils/path';
 const cd: Command = {
   name: 'cd',
   description: "cd: change directory  —  `cd <name>` or `cd ..` to go up",
-  execute(arg, { tree, cwd }) {
+  execute({ args }, { tree, cwd }) {
+    const arg = args[0];
     if (!arg || arg === '~') return { cwd: [] };
 
     const parts = arg.split('/').filter(p => p && p !== '.');

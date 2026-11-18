@@ -11,14 +11,6 @@ describe('makeFile', () => {
     expect(result).toEqual({ 'index.ts': file() });
   });
 
-  it('creates multiple files at root', () => {
-    const result = makeFile({}, [], ['a.ts', 'b.ts']);
-    expect(result).toEqual({
-      'a.ts': file(),
-      'b.ts': file(),
-    });
-  });
-
   it('creates a file inside an existing directory', () => {
     const tree = { src: dir() };
     const result = makeFile(tree, ['src'], 'index.ts');
