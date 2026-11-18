@@ -2,7 +2,7 @@
 
 This is a web app that replicates linux terminal commands.
 
-Find the terminal here: http://react-terminal.herokuapp.com
+Find the terminal here: https://zavjs.github.io/react-terminal/
 
 ### Things the terminal can do:
 
