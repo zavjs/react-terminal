@@ -60,6 +60,7 @@
 .outputLine {
   width: 100%;
   color: #d4d4d4;
+  white-space: pre-wrap;
 }
 
 .errorLine {
