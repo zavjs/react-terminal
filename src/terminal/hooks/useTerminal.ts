@@ -72,11 +72,14 @@ export const useTerminal = ({
     return history[newIndex];
   }, [history, historyIndex]);
 
+  const clearLog = useCallback(() => setLog([]), []);
+
   return {
     log,
     lastLogin,
     prompt,
     submitInput,
     navigateHistory,
+    clearLog,
   };
 };

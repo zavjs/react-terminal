@@ -13,7 +13,7 @@ describe('ls', () => {
   it('lists root contents', () => {
     const tree: Tree = { src: { type: 'dir', contents: {} } };
     const result = ls.execute([], ctx(tree));
-    expect(result.output).toBe('src');
+    expect(result.output).toBe('src/');
   });
 
   it('lists contents of cwd', () => {

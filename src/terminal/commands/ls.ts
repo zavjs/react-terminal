@@ -1,4 +1,4 @@
-import { Command } from '../types';
+import { Command, isDir } from '../types';
 import { getNodeAtPath } from '../utils/path';
 
 const ls: Command = {
@@ -6,8 +6,8 @@ const ls: Command = {
   description: 'ls: list contents of current directory',
   execute(_, { tree, cwd }) {
     const node = getNodeAtPath(tree, cwd) ?? tree;
-    const keys = Object.keys(node);
-    return { output: keys.length ? keys.join('  ') : '' };
+    const entries = Object.entries(node).map(([name, n]) => isDir(n) ? `${name}/` : name);
+    return { output: entries.length ? entries.join('  ') : '' };
   },
 };
 

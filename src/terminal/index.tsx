@@ -4,7 +4,7 @@ import { useTerminal } from './hooks/useTerminal';
 import styles from './Terminal.module.css';
 
 const Terminal = (props: TerminalProps) => {
-  const { log, lastLogin, prompt, submitInput, navigateHistory } = useTerminal(props);
+  const { log, lastLogin, prompt, submitInput, navigateHistory, clearLog } = useTerminal(props);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -46,6 +46,18 @@ const Terminal = (props: TerminalProps) => {
       return;
     }
 
+    if (event.ctrlKey && event.key === 'c') {
+      event.preventDefault();
+      setInputValue('');
+      return;
+    }
+
+    if (event.ctrlKey && event.key === 'l') {
+      event.preventDefault();
+      clearLog();
+      return;
+    }
+
     if (event.key === 'Enter') {
       event.preventDefault();
       const value = inputRef.current?.textContent?.trim() ?? '';
@@ -53,7 +65,7 @@ const Terminal = (props: TerminalProps) => {
       if (!value) return;
       submitInput(value, prompt);
     }
-  }, [prompt, submitInput, navigateHistory, setInputValue]);
+  }, [prompt, submitInput, navigateHistory, setInputValue, clearLog]);
 
   return (
     <div
