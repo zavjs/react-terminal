@@ -11,9 +11,15 @@ export const tokenize = (raw: string): string[] => {
   const tokens: string[] = [];
   let current = '';
   let depth = 0;
+  let quote: '"' | "'" | null = null;
 
   for (const char of raw.trim()) {
-    if (char === '{') { depth++; current += char; }
+    if (quote) {
+      if (char === quote) { quote = null; }
+      else { current += char; }
+    } else if (char === '"' || char === "'") {
+      quote = char;
+    } else if (char === '{') { depth++; current += char; }
     else if (char === '}') { depth--; current += char; }
     else if (char === ' ' && depth === 0) { if (current) { tokens.push(current); current = ''; } }
     else { current += char; }

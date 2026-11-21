@@ -34,4 +34,20 @@ describe('tokenize', () => {
   it('mixes plain tokens and brace expansion', () => {
     expect(tokenize('-r {a,b}')).toEqual(['-r', 'a', 'b']);
   });
+
+  it('keeps double-quoted string as single token', () => {
+    expect(tokenize('"hello world"')).toEqual(['hello world']);
+  });
+
+  it('keeps single-quoted string as single token', () => {
+    expect(tokenize("'hello world'")).toEqual(['hello world']);
+  });
+
+  it('strips quotes from token', () => {
+    expect(tokenize('echo "hello world"')).toEqual(['echo', 'hello world']);
+  });
+
+  it('handles quoted and unquoted tokens together', () => {
+    expect(tokenize('a "b c" d')).toEqual(['a', 'b c', 'd']);
+  });
 });
