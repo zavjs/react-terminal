@@ -10,8 +10,10 @@ import cat from './cat';
 import echo from './echo';
 import rm from './rm';
 import mv from './mv';
+import cp from './cp';
+import grep from './grep';
 
-const builtinCommands: Command[] = [mkdir, touch, ls, cd, pwd, clear, help, cat, echo, rm, mv];
+const builtinCommands: Command[] = [mkdir, touch, ls, cd, pwd, clear, help, cat, echo, rm, mv, cp, grep];
 
 export const resolveCommands = (extra: Command[] = []): Record<string, Command> =>
   [...builtinCommands, ...extra].reduce<Record<string, Command>>((acc, cmd) => {

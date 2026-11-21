@@ -8,18 +8,32 @@
 
 - [x] The user should be able to create folders, one or multiple at once with the following syntax: `mkdir <folder name>` or `mkdir {folderOne,folderTwo,folderThree}`
 
-- [x] The user should be able to list his current folder structure, and all children elements, folders and files within itself with the following syntax: `ls`
+- [x] The user should be able to list contents of the current directory with `ls`. Directories are shown with a trailing `/`.
 
-- [ ] The user should be able to delete files. One or multiple at once. Single files: `rm file.ext`, multiple files `rm {fileOne.ext,fileTwo.ext,fileThree.ext}`
+- [x] The user should be able to delete files, one or multiple at once: `rm file.ext`, `rm file1.ext file2.ext`, `rm {fileOne.ext,fileTwo.ext}`
 
-- [ ] The user should be able to opt for a checklist of basic demo functionality. The checklist will display each basic functionality and instruct the user to execute such command. When the command is executed, the item will automatically be checked.
+- [x] The user should be able to delete folders recursively: `rm -r <folder>`. Force flag `-f` suppresses not-found errors. Combined: `rm -rf`.
 
-- [ ] The user should be able to delete folders. One or multiple at once with the following syntax. Single folders `rm <folder name>`; multiple folders `rm {folderOne,folderTwo,folderTree}`
+- [x] The user should be able to navigate directories: `cd <folder>`, `cd path/to/folder`, `cd ..`, `cd ../..`, `cd ~` to return to root.
 
-- [ ] The user should be able to enter a folder by using absolute path (`cd path/to/folder`) or relative (`cd ./folder`). The user should be able to go back to any parent folders by using the absolute path (`cd path/to/folder`), or relative (`cd ../..`)
+- [ ] The user should be able to print command history with `history`
 
-- [ ] The user should be able to configure a new terminal user name by using `config user.name <new user name>` command.
+- [ ] Terminal output should support ANSI color codes so commands (injected or built-in) can emit colored text
 
-- [ ] The user should see near the terminal a centralized history of all available functionality.
+- [ ] Tab completion for commands and file paths
 
-- [ ] The user should easily visualize highlighted text (i.e: commands). The text need to be configurable with interpolation characters.
+### grep — extended flags (nice to have)
+
+- [ ] `grep -l` — print only filenames of matching files, not lines
+- [ ] `grep -c` — print count of matching lines per file
+- [ ] `grep -A <n>` — print n lines of context after match
+- [ ] `grep -B <n>` — print n lines of context before match
+- [ ] `grep -C <n>` — print n lines before and after match
+- [ ] `grep -w` — match whole words only
+- [ ] `grep -x` — match whole lines only
+- [ ] `grep -m <n>` — stop after n matches
+- [ ] `grep -o` — print only the matching part of line
+- [ ] `grep --include=<glob>` — only search files matching glob (e.g. `*.ts`)
+- [ ] `grep --exclude=<glob>` — skip files matching glob
+- [ ] `grep -e <pattern>` — multiple patterns (`grep -e foo -e bar file`)
+- [ ] `grep -F` — treat pattern as fixed string, not regex
