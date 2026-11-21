@@ -14,7 +14,8 @@ export const runCommand = (
   raw: string,
   tree: Tree,
   cwd: string[],
-  allCommands: Record<string, Command>
+  allCommands: Record<string, Command>,
+  history: string[] = []
 ): RunCommandResult => {
   // shell layer: lex raw input into argv tokens and redirect operators
   const { argv, redirects } = parse(raw);
@@ -23,7 +24,7 @@ export const runCommand = (
   // dispatch: look up handler and execute with current filesystem state
   const handler = allCommands[command];
   const result: CommandResult = handler
-    ? handler.execute(rest, { tree, cwd, allCommands })
+    ? handler.execute(rest, { tree, cwd, allCommands, history })
     : { error: `${command}: command not found` };
 
   // redirect: if stdout should go to a file, write it instead of displaying

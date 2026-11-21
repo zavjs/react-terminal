@@ -22,6 +22,7 @@ export type CommandContext = {
   tree: Tree;
   cwd: string[];
   allCommands: Record<string, Command>;
+  history: string[];
 };
 
 export type Command = {

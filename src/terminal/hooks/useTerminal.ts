@@ -33,7 +33,7 @@ export const useTerminal = ({
 
   const execute = useCallback((raw: string) => {
     const { command, result, newTree, outputRedirected, redirectError } =
-      runCommand(raw, tree, cwd, allCommands);
+      runCommand(raw, tree, cwd, allCommands, history);
 
     if (newTree) setTree(newTree);
     if (result.cwd !== undefined) setCwd(result.cwd);
