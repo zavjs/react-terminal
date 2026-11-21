@@ -55,15 +55,28 @@ export const useTerminal = ({
     execute(value);
   }, [execute]);
 
+  const navigateHistory = useCallback((dir: 'up' | 'down'): string | null => {
+    if (dir === 'up') {
+      const newIndex = historyIndex === -1 ? history.length - 1 : Math.max(0, historyIndex - 1);
+      if (history[newIndex] === undefined) return null;
+      setHistoryIndex(newIndex);
+      return history[newIndex];
+    }
+    if (historyIndex === -1) return null;
+    const newIndex = historyIndex + 1;
+    if (newIndex >= history.length) {
+      setHistoryIndex(-1);
+      return '';
+    }
+    setHistoryIndex(newIndex);
+    return history[newIndex];
+  }, [history, historyIndex]);
+
   return {
     log,
-    history,
-    historyIndex,
-    setHistoryIndex,
     lastLogin,
     prompt,
-    appendLog,
-    execute,
     submitInput,
+    navigateHistory,
   };
 };

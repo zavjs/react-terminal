@@ -4,8 +4,7 @@ import { useTerminal } from './hooks/useTerminal';
 import styles from './Terminal.module.css';
 
 const Terminal = (props: TerminalProps) => {
-  const { log, history, historyIndex, setHistoryIndex, lastLogin, prompt, submitInput } =
-    useTerminal(props);
+  const { log, lastLogin, prompt, submitInput, navigateHistory } = useTerminal(props);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -35,27 +34,15 @@ const Terminal = (props: TerminalProps) => {
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
     if (event.key === 'ArrowUp') {
       event.preventDefault();
-      const newIndex = historyIndex === -1
-        ? history.length - 1
-        : Math.max(0, historyIndex - 1);
-      if (history[newIndex] !== undefined) {
-        setHistoryIndex(newIndex);
-        setInputValue(history[newIndex]);
-      }
+      const value = navigateHistory('up');
+      if (value !== null) setInputValue(value);
       return;
     }
 
     if (event.key === 'ArrowDown') {
       event.preventDefault();
-      if (historyIndex === -1) return;
-      const newIndex = historyIndex + 1;
-      if (newIndex >= history.length) {
-        setHistoryIndex(-1);
-        setInputValue('');
-      } else {
-        setHistoryIndex(newIndex);
-        setInputValue(history[newIndex]);
-      }
+      const value = navigateHistory('down');
+      setInputValue(value ?? '');
       return;
     }
 
@@ -66,7 +53,7 @@ const Terminal = (props: TerminalProps) => {
       if (!value) return;
       submitInput(value, prompt);
     }
-  }, [history, historyIndex, prompt, submitInput, setInputValue, setHistoryIndex]);
+  }, [prompt, submitInput, navigateHistory, setInputValue]);
 
   return (
     <div
