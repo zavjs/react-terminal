@@ -2,7 +2,7 @@ import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
 import { nanoid } from 'nanoid';
 import type { Tree, LogEntry, TerminalProps, CommandResult } from './types';
 import { resolveCommands } from './commands';
-import { parseArgs } from './utils/parseArgs';
+import { tokenize } from './utils/tokenize';
 import styles from './Terminal.module.css';
 
 const Terminal = ({
@@ -60,7 +60,7 @@ const Terminal = ({
 
   const executeCommand = useCallback(
     (raw: string) => {
-      const [command, ...rest] = raw.trim().split(' ');
+      const [command, ...argv] = tokenize(raw);
       const op = allCommands[command];
 
       let result: CommandResult = {};
@@ -68,7 +68,7 @@ const Terminal = ({
       if (!op) {
         result = { error: `${command}: command not found` };
       } else {
-        result = op.execute(parseArgs(rest.join(' ')), { tree, cwd, allCommands });
+        result = op.execute(argv, { tree, cwd, allCommands });
       }
 
       if (result.tree) setTree(result.tree);

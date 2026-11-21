@@ -28,7 +28,7 @@ export type Command = {
   name: string;
   description: string;
   disabled?: boolean;
-  execute: (parsed: ParsedArgs, ctx: CommandContext) => CommandResult;
+  execute: (argv: string[], ctx: CommandContext) => CommandResult;
 };
 
 export type LogEntry =

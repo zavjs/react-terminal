@@ -4,10 +4,10 @@ import { getNodeAtPath } from '../utils/path';
 const cat: Command = {
   name: 'cat',
   description: 'cat: display file contents  —  `cat <file>`',
-  execute({ args }, { tree, cwd }) {
-    if (!args.length) return { error: 'cat: missing operand' };
+  execute(argv, { tree, cwd }) {
+    const arg = argv[0];
+    if (!arg) return { error: 'cat: missing operand' };
 
-    const arg = args[0];
     const segments = arg.split('/').filter(Boolean);
     const fileName = segments[segments.length - 1];
     const dirPath = segments.slice(0, -1);

@@ -1,11 +1,13 @@
 import { Command } from '../types';
+import { parseArgs } from '../utils/parseArgs';
 import { getFilePath, getFileName } from '../utils/path';
 import { makeFile } from '../utils/makeFile';
 
 const touch: Command = {
   name: 'touch',
   description: "touch: create a file  —  `touch <name>` or `touch a.ext b.ext`",
-  execute({ args }, { tree, cwd }) {
+  execute(argv, { tree, cwd }) {
+    const { args } = parseArgs(argv);
     if (!args.length) return { error: 'touch: missing operand' };
     let current = tree;
     for (const arg of args) {
