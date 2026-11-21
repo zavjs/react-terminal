@@ -1,31 +1,14 @@
-import { useState, useRef, useEffect, useCallback, useMemo } from 'react';
-import { nanoid } from 'nanoid';
-import type { Tree, LogEntry, TerminalProps, CommandResult } from './types';
-import { resolveCommands } from './commands';
-import { tokenize } from './utils/tokenize';
+import { useRef, useEffect, useCallback } from 'react';
+import type { TerminalProps } from './types';
+import { useTerminal } from './hooks/useTerminal';
 import styles from './Terminal.module.css';
 
-const Terminal = ({
-  commands: extraCommands = [],
-  username = 'user',
-  machineName = 'computer',
-  initialTree = {},
-  onCommand,
-}: TerminalProps) => {
-  const [tree, setTree] = useState<Tree>(initialTree);
-  const [cwd, setCwd] = useState<string[]>([]);
-  const [log, setLog] = useState<LogEntry[]>([]);
-  const [history, setHistory] = useState<string[]>([]);
-  const [historyIndex, setHistoryIndex] = useState(-1);
-  const [lastLogin] = useState(() => new Date().toUTCString());
+const Terminal = (props: TerminalProps) => {
+  const { log, history, historyIndex, setHistoryIndex, lastLogin, prompt, submitInput } =
+    useTerminal(props);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
-
-  const allCommands = useMemo(
-    () => resolveCommands(extraCommands),
-    [extraCommands]
-  );
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -35,7 +18,7 @@ const Terminal = ({
     if (containerRef.current) {
       containerRef.current.scrollTop = containerRef.current.scrollHeight;
     }
-  }, [log, cwd]);
+  }, [log]);
 
   const setInputValue = useCallback((text: string) => {
     const el = inputRef.current;
@@ -49,83 +32,41 @@ const Terminal = ({
     sel?.addRange(range);
   }, []);
 
-  const appendLog = useCallback((text: string | string[], type: 'output' | 'error' = 'output') => {
-    const entries = (Array.isArray(text) ? text : [text]).map(t => ({
-      id: nanoid(),
-      type,
-      text: t,
-    }));
-    setLog(prev => [...prev, ...entries]);
-  }, []);
-
-  const executeCommand = useCallback(
-    (raw: string) => {
-      const [command, ...argv] = tokenize(raw);
-      const op = allCommands[command];
-
-      let result: CommandResult = {};
-
-      if (!op) {
-        result = { error: `${command}: command not found` };
-      } else {
-        result = op.execute(argv, { tree, cwd, allCommands });
+  const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'ArrowUp') {
+      event.preventDefault();
+      const newIndex = historyIndex === -1
+        ? history.length - 1
+        : Math.max(0, historyIndex - 1);
+      if (history[newIndex] !== undefined) {
+        setHistoryIndex(newIndex);
+        setInputValue(history[newIndex]);
       }
+      return;
+    }
 
-      if (result.tree) setTree(result.tree);
-      if (result.cwd !== undefined) setCwd(result.cwd);
-      if (result.clear) setLog([]);
-      if (result.output) appendLog(result.output);
-      if (result.error) appendLog(result.error, 'error');
-
-      onCommand?.(command, result);
-    },
-    [tree, cwd, allCommands, appendLog, onCommand]
-  );
-
-  const prompt = `${machineName}:~${cwd.length ? '/' + cwd.join('/') : ''} ${username}$`;
-
-  const handleKeyDown = useCallback(
-    (event: React.KeyboardEvent) => {
-      if (event.key === 'ArrowUp') {
-        event.preventDefault();
-        const newIndex =
-          historyIndex === -1
-            ? history.length - 1
-            : Math.max(0, historyIndex - 1);
-        if (history[newIndex] !== undefined) {
-          setHistoryIndex(newIndex);
-          setInputValue(history[newIndex]);
-        }
-        return;
-      }
-
-      if (event.key === 'ArrowDown') {
-        event.preventDefault();
-        if (historyIndex === -1) return;
-        const newIndex = historyIndex + 1;
-        if (newIndex >= history.length) {
-          setHistoryIndex(-1);
-          setInputValue('');
-        } else {
-          setHistoryIndex(newIndex);
-          setInputValue(history[newIndex]);
-        }
-        return;
-      }
-
-      if (event.key === 'Enter') {
-        event.preventDefault();
-        const value = inputRef.current?.textContent?.trim() ?? '';
-        setInputValue('');
-        if (!value) return;
-        setLog(prev => [...prev, { id: nanoid(), type: 'echo', prompt, command: value }]);
-        setHistory(prev => [...prev, value]);
+    if (event.key === 'ArrowDown') {
+      event.preventDefault();
+      if (historyIndex === -1) return;
+      const newIndex = historyIndex + 1;
+      if (newIndex >= history.length) {
         setHistoryIndex(-1);
-        executeCommand(value);
+        setInputValue('');
+      } else {
+        setHistoryIndex(newIndex);
+        setInputValue(history[newIndex]);
       }
-    },
-    [history, historyIndex, prompt, executeCommand, setInputValue]
-  );
+      return;
+    }
+
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      const value = inputRef.current?.textContent?.trim() ?? '';
+      setInputValue('');
+      if (!value) return;
+      submitInput(value, prompt);
+    }
+  }, [history, historyIndex, prompt, submitInput, setInputValue, setHistoryIndex]);
 
   return (
     <div
