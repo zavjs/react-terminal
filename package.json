@@ -1,5 +1,5 @@
 {
-  "name": "react-terminal",
+  "name": "@zavjs/react-terminal",
   "version": "0.2.0",
   "description": "Embeddable browser terminal component",
   "type": "module",

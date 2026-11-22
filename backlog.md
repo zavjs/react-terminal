@@ -16,7 +16,7 @@
 
 - [x] The user should be able to navigate directories: `cd <folder>`, `cd path/to/folder`, `cd ..`, `cd ../..`, `cd ~` to return to root.
 
-- [ ] The user should be able to print command history with `history`
+- [x] The user should be able to print command history with `history`
 
 - [ ] Terminal output should support ANSI color codes so commands (injected or built-in) can emit colored text
 
