@@ -1,4 +1,4 @@
-import type { TerminalProfile, CursorStyle } from '../types';
+import type { TerminalProfile } from '../types';
 import { defaultProfile } from '../defaultProfile';
 import styles from './Settings.module.css';
 
@@ -10,11 +10,6 @@ const FONT_FAMILIES = [
   { label: 'monospace', value: "monospace" },
 ];
 
-const CURSOR_STYLES: { label: string; value: CursorStyle }[] = [
-  { label: 'Block', value: 'block' },
-  { label: 'Underline', value: 'underline' },
-  { label: 'Bar', value: 'vertical-bar' },
-];
 
 const isDefault = (profile: TerminalProfile) =>
   JSON.stringify(profile.text) === JSON.stringify(defaultProfile.text);
@@ -120,24 +115,7 @@ export const SettingsContent = ({ profiles, profile, onChange, onClose }: Props)
               </div>
             </div>
 
-            <div className={styles.section}>
-              <span className={styles.sectionLabel}>Cursor</span>
-              <div className={styles.radioGroup}>
-                {CURSOR_STYLES.map(c => (
-                  <label key={c.value} className={styles.radioBtn}>
-                    <input
-                      type="radio"
-                      name="cursorStyle"
-                      value={c.value}
-                      checked={text.cursorStyle === c.value}
-                      onChange={() => setTextField('cursorStyle', c.value)}
-                    />
-                    {c.label}
-                  </label>
-                ))}
               </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>

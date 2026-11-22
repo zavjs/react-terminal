@@ -35,14 +35,14 @@
   background: none;
   border: none;
   cursor: pointer;
-  color: #666;
+  color: #888;
   padding: 0;
   display: flex;
   align-items: center;
   transition: color 120ms;
 }
 
-.settingsBtn:hover { color: #bbb; }
+.settingsBtn:hover { color: #ccc; }
 
 .barOption {
   width: 16px;
@@ -99,11 +99,9 @@
 }
 
 .input {
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 14px;
   flex-grow: 1;
   padding-left: 6px;
-  color: white;
+  color: inherit;
   white-space: nowrap;
   cursor: text;
   outline: none;
