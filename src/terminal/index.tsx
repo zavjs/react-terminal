@@ -1,5 +1,6 @@
 import { useRef, useEffect, useCallback, useState } from 'react';
-import type { TerminalProps } from './types';
+import { nanoid } from 'nanoid';
+import type { TerminalProps, Tree } from './types';
 import { useTerminal } from './hooks/useTerminal';
 import { SettingsModal } from './components/SettingsModal';
 import { SettingsDrawer } from './components/SettingsDrawer';
@@ -12,19 +13,17 @@ const GearIcon = () => (
   </svg>
 );
 
-const Terminal = (props: TerminalProps) => {
-  const { settingsDisplay = 'modal', profiles, profile, onProfileChange } = props;
+type Tab = { id: string; label: string };
+
+const TerminalPane = (props: TerminalProps) => {
   const { log, lastLogin, prompt, submitInput, navigateHistory, clearLog, complete } = useTerminal(props);
-  const [settingsOpen, setSettingsOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
   const completionsRef = useRef<string[]>([]);
   const completionIdxRef = useRef(0);
 
-  useEffect(() => {
-    inputRef.current?.focus();
-  }, []);
+  useEffect(() => { inputRef.current?.focus(); }, []);
 
   useEffect(() => {
     if (containerRef.current) {
@@ -101,6 +100,80 @@ const Terminal = (props: TerminalProps) => {
     }
   }, [prompt, submitInput, navigateHistory, setInputValue, clearLog, complete]);
 
+  return (
+    <div
+      ref={containerRef}
+      className={styles.container}
+      onClick={() => inputRef.current?.focus()}
+    >
+      <div className={styles.content}>
+        <div className={styles.line}>Last Login: {lastLogin} on Console</div>
+        <div className={styles.logLine}>
+          Press `help` to see available commands
+        </div>
+        {log.map(entry => {
+          if (entry.type === 'echo') {
+            return (
+              <div key={entry.id} className={styles.inputLine}>
+                <span className={styles.prompt}>{entry.prompt}</span>
+                <span className={styles.echoCommand}>{entry.command}</span>
+              </div>
+            );
+          }
+          return (
+            <div
+              key={entry.id}
+              className={entry.type === 'error' ? styles.errorLine : styles.outputLine}
+            >
+              {ansiToSpans(entry.text)}
+            </div>
+          );
+        })}
+        <div className={styles.inputLine}>
+          <span className={styles.prompt}>{prompt}</span>
+          <div
+            ref={inputRef}
+            className={styles.input}
+            contentEditable
+            suppressContentEditableWarning
+            onKeyDown={handleKeyDown}
+          />
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const Terminal = (props: TerminalProps) => {
+  const {
+    settingsDisplay = 'modal',
+    profiles,
+    profile,
+    onProfileChange,
+    tabs = false,
+    initialTree = {},
+  } = props;
+
+  const [settingsOpen, setSettingsOpen] = useState(false);
+  const [sharedTree, setSharedTree] = useState<Tree>(initialTree);
+  const [tabList, setTabList] = useState<Tab[]>(() => [{ id: nanoid(), label: 'Terminal 1' }]);
+  const [activeId, setActiveId] = useState<string>(() => tabList[0].id);
+  const tabCounter = useRef(2);
+
+  const addTab = () => {
+    const id = nanoid();
+    setTabList(prev => [...prev, { id, label: `Terminal ${tabCounter.current++}` }]);
+    setActiveId(id);
+  };
+
+  const closeTab = (id: string) => {
+    if (tabList.length === 1) return;
+    const idx = tabList.findIndex(t => t.id === id);
+    const next = tabList.filter(t => t.id !== id);
+    setTabList(next);
+    if (activeId === id) setActiveId(next[Math.min(idx, next.length - 1)].id);
+  };
+
   const handleWrapperKeyDown = useCallback((event: React.KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key === ',') {
       event.preventDefault();
@@ -115,19 +188,52 @@ const Terminal = (props: TerminalProps) => {
     '--term-font-size': `${profile.text.font.size}px`,
   } as React.CSSProperties : {};
 
+  const hasSettings = profiles && profile && onProfileChange;
+
   return (
     <div className={styles.wrapper} style={cssVars} onKeyDown={handleWrapperKeyDown}>
-      <div
-        ref={containerRef}
-        className={styles.container}
-        onClick={() => inputRef.current?.focus()}
-      >
+      {tabs ? (
+        <div className={styles.tabBar}>
+          <div className={styles.dots}>
+            <span className={`${styles.barOption} ${styles.red}`} />
+            <span className={`${styles.barOption} ${styles.blue}`} />
+            <span className={`${styles.barOption} ${styles.green}`} />
+          </div>
+          <div className={styles.tabStrip}>
+            {tabList.map(tab => (
+              <div
+                key={tab.id}
+                className={`${styles.tab} ${tab.id === activeId ? styles.activeTab : ''}`}
+                onClick={() => setActiveId(tab.id)}
+              >
+                <span className={styles.tabLabel}>{tab.label}</span>
+                {tabList.length > 1 && (
+                  <button
+                    className={styles.closeBtn}
+                    onClick={e => { e.stopPropagation(); closeTab(tab.id); }}
+                  >×</button>
+                )}
+              </div>
+            ))}
+          </div>
+          <button className={styles.addBtn} onClick={addTab} title="New tab">+</button>
+          {hasSettings && (
+            <button
+              className={styles.settingsBtn}
+              onClick={() => setSettingsOpen(o => !o)}
+              title="Settings (⌘,)"
+            >
+              <GearIcon />
+            </button>
+          )}
+        </div>
+      ) : (
         <div className={styles.menuBar}>
           <span className={`${styles.barOption} ${styles.red}`} />
           <span className={`${styles.barOption} ${styles.blue}`} />
           <span className={`${styles.barOption} ${styles.green}`} />
           <div className={styles.menuBarSpacer} />
-          {profiles && profile && onProfileChange && (
+          {hasSettings && (
             <button
               className={styles.settingsBtn}
               onClick={e => { e.stopPropagation(); setSettingsOpen(o => !o); }}
@@ -137,43 +243,25 @@ const Terminal = (props: TerminalProps) => {
             </button>
           )}
         </div>
-        <div className={styles.content}>
-          <div className={styles.line}>Last Login: {lastLogin} on Console</div>
-          <div className={styles.logLine}>
-            Press `help` to see available commands
-          </div>
-          {log.map(entry => {
-            if (entry.type === 'echo') {
-              return (
-                <div key={entry.id} className={styles.inputLine}>
-                  <span className={styles.prompt}>{entry.prompt}</span>
-                  <span className={styles.echoCommand}>{entry.command}</span>
-                </div>
-              );
-            }
-            return (
-              <div
-                key={entry.id}
-                className={entry.type === 'error' ? styles.errorLine : styles.outputLine}
-              >
-                {ansiToSpans(entry.text)}
-              </div>
-            );
-          })}
-          <div className={styles.inputLine}>
-            <span className={styles.prompt}>{prompt}</span>
-            <div
-              ref={inputRef}
-              className={styles.input}
-              contentEditable
-              suppressContentEditableWarning
-              onKeyDown={handleKeyDown}
-            />
-          </div>
-        </div>
-      </div>
+      )}
 
-      {profiles && profile && onProfileChange && settingsDisplay === 'modal' && settingsOpen && (
+      {tabs ? (
+        <div className={styles.tabContent}>
+          {tabList.map(tab => (
+            <div
+              key={tab.id}
+              className={styles.tabPane}
+              style={{ display: tab.id === activeId ? 'block' : 'none' }}
+            >
+              <TerminalPane {...props} tree={sharedTree} onTreeChange={setSharedTree} />
+            </div>
+          ))}
+        </div>
+      ) : (
+        <TerminalPane {...props} />
+      )}
+
+      {hasSettings && settingsDisplay === 'modal' && settingsOpen && (
         <SettingsModal
           profiles={profiles}
           profile={profile}
@@ -182,7 +270,7 @@ const Terminal = (props: TerminalProps) => {
         />
       )}
 
-      {profiles && profile && onProfileChange && settingsDisplay === 'drawer' && (
+      {hasSettings && settingsDisplay === 'drawer' && (
         <SettingsDrawer
           open={settingsOpen}
           profiles={profiles}

@@ -135,6 +135,7 @@ const App = () => {
         onProfileChange={handleProfileChange}
         settingsDisplay="modal"
         initialTree={initialTree}
+        tabs
       />
       <footer className="credits">
         <a href="https://github.com/zavjs/react-terminal" target="_blank" rel="noopener noreferrer">GitHub</a>

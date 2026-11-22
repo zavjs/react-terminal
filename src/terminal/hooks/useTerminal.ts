@@ -1,4 +1,4 @@
-import { useState, useCallback, useMemo } from 'react';
+import { useState, useCallback, useMemo, useRef } from 'react';
 import { nanoid } from 'nanoid';
 import type { Tree, LogEntry, TerminalProps } from '../types';
 import { resolveCommands } from '../commands';
@@ -10,9 +10,24 @@ export const useTerminal = ({
   username = 'user',
   machineName = 'computer',
   initialTree = {},
+  tree: controlledTree,
+  onTreeChange,
   onCommand,
 }: TerminalProps) => {
-  const [tree, setTree] = useState<Tree>(initialTree);
+  const [internalTree, setInternalTree] = useState<Tree>(initialTree);
+  const isControlled = useRef(controlledTree !== undefined).current;
+  const onTreeChangeRef = useRef(onTreeChange);
+  onTreeChangeRef.current = onTreeChange;
+
+  const tree = isControlled ? controlledTree! : internalTree;
+
+  const setTree = useCallback((newTree: Tree) => {
+    if (isControlled) {
+      onTreeChangeRef.current?.(newTree);
+    } else {
+      setInternalTree(newTree);
+    }
+  }, [isControlled]);
   const [cwd, setCwd] = useState<string[]>([]);
   const [log, setLog] = useState<LogEntry[]>([]);
   const [history, setHistory] = useState<string[]>([]);
@@ -47,7 +62,7 @@ export const useTerminal = ({
     }
 
     onCommand?.(command, result);
-  }, [tree, cwd, allCommands, appendLog, onCommand]);
+  }, [tree, cwd, allCommands, appendLog, onCommand, setTree]);
 
   const submitInput = useCallback((value: string, currentPrompt: string) => {
     setLog(prev => [...prev, { id: nanoid(), type: 'echo', prompt: currentPrompt, command: value }]);

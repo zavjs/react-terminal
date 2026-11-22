@@ -63,6 +63,9 @@ export type TerminalProps = {
   username?: string;
   machineName?: string;
   initialTree?: Tree;
+  tree?: Tree;
+  onTreeChange?: (tree: Tree) => void;
+  tabs?: boolean;
   onCommand?: (command: string, result: CommandResult) => void;
   profiles?: TerminalProfile[];
   profile?: TerminalProfile;
