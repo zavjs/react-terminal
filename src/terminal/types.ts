@@ -22,7 +22,7 @@ export type CommandContext = {
   tree: Tree;
   cwd: string[];
   allCommands: Record<string, Command>;
-  history: string[];
+  history?: string[];
 };
 
 export type Command = {
@@ -37,10 +37,35 @@ export type LogEntry =
   | { id: string; type: 'error'; text: string }
   | { id: string; type: 'echo'; prompt: string; command: string };
 
+export type CursorStyle = 'block' | 'underline' | 'vertical-bar';
+
+export type TerminalFont = {
+  family: string;
+  size: number;
+};
+
+export type TerminalTextSettings = {
+  background: string;
+  foreground: string;
+  font: TerminalFont;
+  cursorStyle: CursorStyle;
+};
+
+export type TerminalProfile = {
+  name: string;
+  text: TerminalTextSettings;
+  // future: window: TerminalWindowSettings;
+  // future: keyboard: TerminalKeyboardSettings;
+};
+
 export type TerminalProps = {
   commands?: Command[];
   username?: string;
   machineName?: string;
   initialTree?: Tree;
   onCommand?: (command: string, result: CommandResult) => void;
+  profiles?: TerminalProfile[];
+  profile?: TerminalProfile;
+  onProfileChange?: (profile: TerminalProfile) => void;
+  settingsDisplay?: 'modal' | 'drawer';
 };
