@@ -1,10 +1,17 @@
-.container {
+.wrapper {
+  position: relative;
   width: 100%;
   min-height: 450px;
   height: 70vh;
-  overflow-y: auto;
   border-radius: 10px;
-  background-color: #000;
+  overflow: hidden;
+}
+
+.container {
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+  background-color: var(--term-bg, #000);
 }
 
 .menuBar {
@@ -19,7 +26,23 @@
   box-sizing: border-box;
   position: sticky;
   top: 0;
+  z-index: 1;
 }
+
+.menuBarSpacer { flex: 1; }
+
+.settingsBtn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #666;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  transition: color 120ms;
+}
+
+.settingsBtn:hover { color: #bbb; }
 
 .barOption {
   width: 16px;
@@ -34,9 +57,9 @@
 .green { background-color: #28c840; }
 
 .content {
-  color: white;
-  font-family: 'Monaco', 'Menlo', 'Courier New', monospace;
-  font-size: 14px;
+  color: var(--term-fg, white);
+  font-family: var(--term-font-family, Monaco, Menlo, 'Courier New', monospace);
+  font-size: var(--term-font-size, 14px);
   text-align: left;
   padding: 8px 10px;
 }
