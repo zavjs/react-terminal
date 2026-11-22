@@ -23,11 +23,16 @@ const searchTree = (tree: Tree, pattern: RegExp, prefix: string, invert: boolean
     return searchFile((node as FileNode).content, pattern, path, invert);
   });
 
-const formatMatch = (m: Match, multiFile: boolean, lineNumbers: boolean): string => {
+const highlight = (line: string, pattern: RegExp): string => {
+  const flags = pattern.flags.includes('g') ? pattern.flags : pattern.flags + 'g';
+  return line.replace(new RegExp(pattern.source, flags), m => `\x1b[1;31m${m}\x1b[0m`);
+};
+
+const formatMatch = (m: Match, multiFile: boolean, lineNumbers: boolean, pattern: RegExp, invert: boolean): string => {
   const parts: string[] = [];
-  if (multiFile) parts.push(m.file);
-  if (lineNumbers) parts.push(String(m.lineNum));
-  parts.push(m.line);
+  if (multiFile) parts.push(`\x1b[35m${m.file}\x1b[0m`);
+  if (lineNumbers) parts.push(`\x1b[32m${m.lineNum}\x1b[0m`);
+  parts.push(invert ? m.line : highlight(m.line, pattern));
   return parts.join(':');
 };
 
@@ -71,7 +76,7 @@ const grep: Command = {
 
     if (!results.length) return {};
 
-    return { output: results.map(m => formatMatch(m, multiFile, lineNumbers)) };
+    return { output: results.map(m => formatMatch(m, multiFile, lineNumbers, pattern, invert)) };
   },
 };
 
