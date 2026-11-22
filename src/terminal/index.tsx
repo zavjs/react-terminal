@@ -3,6 +3,7 @@ import type { TerminalProps } from './types';
 import { useTerminal } from './hooks/useTerminal';
 import { SettingsModal } from './components/SettingsModal';
 import { SettingsDrawer } from './components/SettingsDrawer';
+import { ansiToSpans } from './utils/ansi';
 import styles from './Terminal.module.css';
 
 const GearIcon = () => (
@@ -155,7 +156,7 @@ const Terminal = (props: TerminalProps) => {
                 key={entry.id}
                 className={entry.type === 'error' ? styles.errorLine : styles.outputLine}
               >
-                {entry.text}
+                {ansiToSpans(entry.text)}
               </div>
             );
           })}

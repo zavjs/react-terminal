@@ -18,9 +18,17 @@
 
 - [x] The user should be able to print command history with `history`
 
-- [ ] Terminal output should support ANSI color codes so commands (injected or built-in) can emit colored text
+- [x] Terminal output should support ANSI color codes so commands (injected or built-in) can emit colored text
 
-- [ ] Tab completion for commands and file paths
+- [x] Tab completion — stage 1: command names, file/dir paths in last token
+- [ ] Tab completion — stage 2: context-aware completion
+  - [ ] `cd` completes only directories, not files
+  - [ ] Flag completion (`grep -` → `-i`, `-n`, `-r`, `-v`, …)
+  - [ ] `cat`/`rm` skip directory-only suggestions
+- [ ] Tab completion — stage 3: UX polish
+  - [ ] Cycle through matches on repeated Tab press
+  - [ ] Print all matches when >1 (like real bash)
+  - [ ] Tilde expansion (`~/`) in path completion
 
 ### grep — extended flags (nice to have)
 
