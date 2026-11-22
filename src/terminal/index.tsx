@@ -13,11 +13,13 @@ const GearIcon = () => (
 
 const Terminal = (props: TerminalProps) => {
   const { settingsDisplay = 'modal', profiles, profile, onProfileChange } = props;
-  const { log, lastLogin, prompt, submitInput, navigateHistory, clearLog } = useTerminal(props);
+  const { log, lastLogin, prompt, submitInput, navigateHistory, clearLog, complete } = useTerminal(props);
   const [settingsOpen, setSettingsOpen] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
+  const completionsRef = useRef<string[]>([]);
+  const completionIdxRef = useRef(0);
 
   useEffect(() => {
     inputRef.current?.focus();
@@ -41,7 +43,28 @@ const Terminal = (props: TerminalProps) => {
     sel?.addRange(range);
   }, []);
 
+  const resetCompletion = () => {
+    completionsRef.current = [];
+    completionIdxRef.current = 0;
+  };
+
   const handleKeyDown = useCallback((event: React.KeyboardEvent) => {
+    if (event.key === 'Tab') {
+      event.preventDefault();
+      const input = inputRef.current?.textContent ?? '';
+      if (!completionsRef.current.length) {
+        completionsRef.current = complete(input);
+        completionIdxRef.current = 0;
+      }
+      const matches = completionsRef.current;
+      if (!matches.length) return;
+      setInputValue(matches[completionIdxRef.current]);
+      completionIdxRef.current = (completionIdxRef.current + 1) % matches.length;
+      return;
+    }
+
+    resetCompletion();
+
     if (event.key === 'ArrowUp') {
       event.preventDefault();
       const value = navigateHistory('up');
@@ -75,7 +98,7 @@ const Terminal = (props: TerminalProps) => {
       if (!value) return;
       submitInput(value, prompt);
     }
-  }, [prompt, submitInput, navigateHistory, setInputValue, clearLog]);
+  }, [prompt, submitInput, navigateHistory, setInputValue, clearLog, complete]);
 
   const handleWrapperKeyDown = useCallback((event: React.KeyboardEvent) => {
     if ((event.metaKey || event.ctrlKey) && event.key === ',') {

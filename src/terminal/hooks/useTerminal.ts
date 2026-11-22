@@ -3,6 +3,7 @@ import { nanoid } from 'nanoid';
 import type { Tree, LogEntry, TerminalProps } from '../types';
 import { resolveCommands } from '../commands';
 import { runCommand } from '../utils/runCommand';
+import { useCompletion } from './useCompletion';
 
 export const useTerminal = ({
   commands: extraCommands = [],
@@ -73,6 +74,7 @@ export const useTerminal = ({
   }, [history, historyIndex]);
 
   const clearLog = useCallback(() => setLog([]), []);
+  const { complete } = useCompletion(tree, cwd, allCommands);
 
   return {
     log,
@@ -81,5 +83,6 @@ export const useTerminal = ({
     submitInput,
     navigateHistory,
     clearLog,
+    complete,
   };
 };
