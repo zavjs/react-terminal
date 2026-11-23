@@ -10,12 +10,34 @@ export function isDir(node: TreeNode): node is DirNode {
   return node.type === 'dir';
 }
 
+export type Bus = {
+  send(event: string, payload?: unknown): void;
+  on(event: string, handler: (payload?: unknown) => void): () => void;
+};
+
+export type ProgramCtx = {
+  argv: string[];
+  print(text: string): void;
+  printError(text: string): void;
+  prompt(label?: string): Promise<string>;
+  sleep(ms: number): Promise<void>;
+  signal: AbortSignal;
+  tree: Tree;
+  bus: Bus;
+};
+
+export type Program = {
+  name: string;
+  run(ctx: ProgramCtx): Promise<number | void>;
+};
+
 export type CommandResult = {
   tree?: Tree;
   cwd?: string[];
   output?: string | string[];
   error?: string;
   clear?: boolean;
+  program?: Program;
 };
 
 export type CommandContext = {
@@ -71,4 +93,5 @@ export type TerminalProps = {
   profile?: TerminalProfile;
   onProfileChange?: (profile: TerminalProfile) => void;
   settingsDisplay?: 'modal' | 'drawer';
+  bus?: Bus;
 };

@@ -13,8 +13,9 @@ import mv from './mv';
 import cp from './cp';
 import grep from './grep';
 import history from './history';
+import ping from './ping';
 
-const builtinCommands: Command[] = [mkdir, touch, ls, cd, pwd, clear, help, cat, echo, rm, mv, cp, grep, history];
+const builtinCommands: Command[] = [mkdir, touch, ls, cd, pwd, clear, help, cat, echo, rm, mv, cp, grep, history, ping];
 
 export const resolveCommands = (extra: Command[] = []): Record<string, Command> =>
   [...builtinCommands, ...extra].reduce<Record<string, Command>>((acc, cmd) => {

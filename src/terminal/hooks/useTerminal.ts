@@ -1,9 +1,15 @@
 import { useState, useCallback, useMemo, useRef } from 'react';
 import { nanoid } from 'nanoid';
-import type { Tree, LogEntry, TerminalProps } from '../types';
+import type { Tree, LogEntry, TerminalProps, Bus } from '../types';
 import { resolveCommands } from '../commands';
 import { runCommand } from '../utils/runCommand';
 import { useCompletion } from './useCompletion';
+import { makeProgramCtx } from '../utils/makeProgramCtx';
+
+const NOP_BUS: Bus = {
+  send: () => {},
+  on: () => () => {},
+};
 
 export const useTerminal = ({
   commands: extraCommands = [],
@@ -13,6 +19,7 @@ export const useTerminal = ({
   tree: controlledTree,
   onTreeChange,
   onCommand,
+  bus: externalBus,
 }: TerminalProps) => {
   const [internalTree, setInternalTree] = useState<Tree>(initialTree);
   const isControlled = useRef(controlledTree !== undefined).current;
@@ -28,11 +35,18 @@ export const useTerminal = ({
       setInternalTree(newTree);
     }
   }, [isControlled]);
+
   const [cwd, setCwd] = useState<string[]>([]);
   const [log, setLog] = useState<LogEntry[]>([]);
   const [history, setHistory] = useState<string[]>([]);
   const [historyIndex, setHistoryIndex] = useState(-1);
   const [lastLogin] = useState(() => new Date().toUTCString());
+  const [isProgramRunning, setIsProgramRunning] = useState(false);
+
+  const promptResolverRef = useRef<((value: string) => void) | null>(null);
+  const abortControllerRef = useRef<AbortController | null>(null);
+  const treeRef = useRef(tree);
+  treeRef.current = tree;
 
   const allCommands = useMemo(() => resolveCommands(extraCommands), [extraCommands]);
 
@@ -62,7 +76,29 @@ export const useTerminal = ({
     }
 
     onCommand?.(command, result);
-  }, [tree, cwd, allCommands, appendLog, onCommand, setTree]);
+
+    if (result.program) {
+      const program = result.program;
+      const ac = new AbortController();
+      abortControllerRef.current = ac;
+      setIsProgramRunning(true);
+
+      const ctx = makeProgramCtx({
+        argv: raw.trim().split(/\s+/),
+        signal: ac.signal,
+        appendLog,
+        promptResolverRef,
+        treeRef,
+        bus: externalBus ?? NOP_BUS,
+      });
+
+      program.run(ctx).finally(() => {
+        abortControllerRef.current = null;
+        promptResolverRef.current = null;
+        setIsProgramRunning(false);
+      });
+    }
+  }, [tree, cwd, allCommands, appendLog, onCommand, setTree, externalBus]);
 
   const submitInput = useCallback((value: string, currentPrompt: string) => {
     setLog(prev => [...prev, { id: nanoid(), type: 'echo', prompt: currentPrompt, command: value }]);
@@ -70,6 +106,19 @@ export const useTerminal = ({
     setHistoryIndex(-1);
     execute(value);
   }, [execute]);
+
+  const submitProgramInput = useCallback((value: string, currentPrompt: string) => {
+    setLog(prev => [...prev, { id: nanoid(), type: 'echo', prompt: currentPrompt, command: value }]);
+    const resolver = promptResolverRef.current;
+    if (resolver) {
+      promptResolverRef.current = null;
+      resolver(value);
+    }
+  }, []);
+
+  const abortProgram = useCallback(() => {
+    abortControllerRef.current?.abort();
+  }, []);
 
   const navigateHistory = useCallback((dir: 'up' | 'down'): string | null => {
     if (dir === 'up') {
@@ -96,8 +145,12 @@ export const useTerminal = ({
     lastLogin,
     prompt,
     submitInput,
+    submitProgramInput,
+    abortProgram,
     navigateHistory,
     clearLog,
     complete,
+    isProgramRunning,
+    appendLog,
   };
 };

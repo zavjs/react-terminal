@@ -1,6 +1,6 @@
-import { useRef, useEffect, useCallback, useState } from 'react';
+import { useRef, useEffect, useCallback, useState, useMemo } from 'react';
 import { nanoid } from 'nanoid';
-import type { TerminalProps, Tree } from './types';
+import type { TerminalProps, Tree, Bus } from './types';
 import { useTerminal } from './hooks/useTerminal';
 import { SettingsModal } from './components/SettingsModal';
 import { SettingsDrawer } from './components/SettingsDrawer';
@@ -16,7 +16,12 @@ const GearIcon = () => (
 type Tab = { id: string; label: string };
 
 const TerminalPane = (props: TerminalProps) => {
-  const { log, lastLogin, prompt, submitInput, navigateHistory, clearLog, complete } = useTerminal(props);
+  const {
+    log, lastLogin, prompt,
+    submitInput, submitProgramInput, abortProgram,
+    navigateHistory, clearLog, complete,
+    isProgramRunning,
+  } = useTerminal(props);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLDivElement>(null);
@@ -81,13 +86,8 @@ const TerminalPane = (props: TerminalProps) => {
 
     if (event.ctrlKey && event.key === 'c') {
       event.preventDefault();
+      if (isProgramRunning) abortProgram();
       setInputValue('');
-      return;
-    }
-
-    if (event.ctrlKey && event.key === 'l') {
-      event.preventDefault();
-      clearLog();
       return;
     }
 
@@ -95,10 +95,23 @@ const TerminalPane = (props: TerminalProps) => {
       event.preventDefault();
       const value = inputRef.current?.textContent?.trim() ?? '';
       setInputValue('');
+      if (isProgramRunning) {
+        submitProgramInput(value, prompt);
+        return;
+      }
       if (!value) return;
       submitInput(value, prompt);
+      return;
     }
-  }, [prompt, submitInput, navigateHistory, setInputValue, clearLog, complete]);
+
+    if (isProgramRunning) return;
+
+    if (event.ctrlKey && event.key === 'l') {
+      event.preventDefault();
+      clearLog();
+      return;
+    }
+  }, [prompt, submitInput, submitProgramInput, abortProgram, isProgramRunning, navigateHistory, setInputValue, clearLog, complete]);
 
   return (
     <div
@@ -159,6 +172,20 @@ const Terminal = (props: TerminalProps) => {
   const [tabList, setTabList] = useState<Tab[]>(() => [{ id: nanoid(), label: 'Terminal 1' }]);
   const [activeId, setActiveId] = useState<string>(() => tabList[0].id);
   const tabCounter = useRef(2);
+
+  const sharedBus = useMemo<Bus>(() => {
+    const handlers = new Map<string, Set<(payload?: unknown) => void>>();
+    return {
+      send(event, payload) {
+        handlers.get(event)?.forEach(h => h(payload));
+      },
+      on(event, handler) {
+        if (!handlers.has(event)) handlers.set(event, new Set());
+        handlers.get(event)!.add(handler);
+        return () => handlers.get(event)?.delete(handler);
+      },
+    };
+  }, []);
 
   const addTab = () => {
     const id = nanoid();
@@ -253,12 +280,12 @@ const Terminal = (props: TerminalProps) => {
               className={styles.tabPane}
               style={{ display: tab.id === activeId ? 'block' : 'none' }}
             >
-              <TerminalPane {...props} tree={sharedTree} onTreeChange={setSharedTree} />
+              <TerminalPane {...props} tree={sharedTree} onTreeChange={setSharedTree} bus={props.bus ?? sharedBus} />
             </div>
           ))}
         </div>
       ) : (
-        <TerminalPane {...props} />
+        <TerminalPane {...props} bus={props.bus ?? sharedBus} />
       )}
 
       {hasSettings && settingsDisplay === 'modal' && settingsOpen && (
@@ -284,4 +311,4 @@ const Terminal = (props: TerminalProps) => {
 };
 
 export default Terminal;
-export type { TerminalProps, Command, CommandResult, Tree, TerminalProfile, CursorStyle } from './types';
+export type { TerminalProps, Command, CommandResult, Tree, TerminalProfile, CursorStyle, Program, ProgramCtx, Bus } from './types';
